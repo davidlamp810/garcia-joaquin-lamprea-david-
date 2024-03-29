@@ -1,16 +1,17 @@
 package com.backend.clinicaodontologica.dto.salida;
+import java.util.Objects;
 
 public class DomicilioSalidaDto {
     private Long id;
     private String calle;
-    private int numero;
+    private Integer numero;
     private String localidad;
     private String provincia;
 
     public DomicilioSalidaDto() {
     }
 
-    public DomicilioSalidaDto(Long id, String calle, int numero, String localidad, String provincia) {
+    public DomicilioSalidaDto(Long id, String calle, Integer numero, String localidad, String provincia) {
         this.id = id;
         this.calle = calle;
         this.numero = numero;
@@ -34,11 +35,11 @@ public class DomicilioSalidaDto {
         this.calle = calle;
     }
 
-    public int getNumero() {
+    public Integer getNumero() {
         return numero;
     }
 
-    public void setNumero(int numero) {
+    public void setNumero(Integer numero) {
         this.numero = numero;
     }
 

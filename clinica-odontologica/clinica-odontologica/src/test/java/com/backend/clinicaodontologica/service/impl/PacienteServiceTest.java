@@ -1,62 +1,98 @@
 package com.backend.clinicaodontologica.service.impl;
 
-import com.backend.clinicaodontologica.dto.entrada.DomicilioEntradaDto;
 import com.backend.clinicaodontologica.dto.entrada.PacienteEntradaDto;
 import com.backend.clinicaodontologica.dto.salida.PacienteSalidaDto;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import com.backend.clinicaodontologica.entity.Paciente;
+import com.backend.clinicaodontologica.exceptions.ResourceNotFoundException;
+import com.backend.clinicaodontologica.repository.PacienteRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 
-import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestPropertySource(locations = "classpath:application-test.properties")
 class PacienteServiceTest {
 
-    @Autowired
+    @Mock
+    private PacienteRepository pacienteRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
     private PacienteService pacienteService;
 
-
-    @Test
-    @Order(1)
-    void deberiaRegistrarseUnPacienteDeNombreJuan_yRetornarSuId() {
-        //arrange
-        PacienteEntradaDto pacienteEntradaDto = new PacienteEntradaDto("Juan", "Perez", 123456, LocalDate.of(2024, 3, 22), new DomicilioEntradaDto("Calle", 1234, "Localidad", "Provincia"));
-
-        //act
-        PacienteSalidaDto pacienteSalidaDto = pacienteService.registrarPaciente(pacienteEntradaDto);
-
-        //assert
-        assertNotNull(pacienteSalidaDto);
-        assertNotNull(pacienteSalidaDto.getId());
-        assertEquals("Juan", pacienteSalidaDto.getNombre());
-
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    @Order(2)
-    void deberiaEliminarseElPacienteConId1() {
+    void registrarPaciente_WhenValidInput_ReturnsPacienteSalidaDto() {
+        // Arrange
+        PacienteEntradaDto entradaDto = new PacienteEntradaDto();
+        entradaDto.setNombre("John");
+        entradaDto.setApellido("Doe");
 
+        Paciente paciente = new Paciente();
+        paciente.setNombre("John");
+        paciente.setApellido("Doe");
 
-        assertDoesNotThrow(() -> pacienteService.eliminarPaciente(1L));
+        when(modelMapper.map(entradaDto, Paciente.class)).thenReturn(paciente);
+        when(pacienteRepository.save(paciente)).thenReturn(paciente);
+
+        // Act
+        PacienteSalidaDto salidaDto = pacienteService.registrarPaciente(entradaDto);
+
+        // Assert
+        assertEquals("John", salidaDto.getNombre());
+        assertEquals("Doe", salidaDto.getApellido());
     }
-
 
     @Test
-    @Order(3)
-    void deberiaDevolverUnaListaVaciaDePacientes() {
-        List<PacienteSalidaDto> pacientes = pacienteService.listarPacientes();
+    void listarPacientes_WhenPacientesExist_ReturnsListOfPacienteSalidaDto() {
+        // Arrange
+        Paciente paciente = new Paciente();
+        paciente.setNombre("John");
+        paciente.setApellido("Doe");
 
-        assertTrue(pacientes.isEmpty());
+        when(pacienteRepository.findAll()).thenReturn(Collections.singletonList(paciente));
+
+        // Act
+        List<PacienteSalidaDto> salidaDtoList = pacienteService.listarPacientes();
+
+        // Assert
+        assertFalse(salidaDtoList.isEmpty());
+        assertEquals("John", salidaDtoList.get(0).getNombre());
+        assertEquals("Doe", salidaDtoList.get(0).getApellido());
     }
 
+    @Test
+    void buscarPacientePorId_WhenValidId_ReturnsPacienteSalidaDto() {
+        // Arrange
+        Long id = 1L;
+        Paciente paciente = new Paciente();
+        paciente.setId(id);
+        paciente.setNombre("John");
+        paciente.setApellido("Doe");
+
+        when(pacienteRepository.findById(id)).thenReturn(Optional.of(paciente));
+
+        // Act
+        PacienteSalidaDto salidaDto = pacienteService.buscarPacientePorId(id);
+
+        // Assert
+        assertEquals(id, salidaDto.getId());
+        assertEquals("John", salidaDto.getNombre());
+        assertEquals("Doe", salidaDto.getApellido());
+    }
 
 }

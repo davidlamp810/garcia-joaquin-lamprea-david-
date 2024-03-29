@@ -13,31 +13,25 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ResourceNotFoundException.class})
+    @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> manejarResourceNotFound(ResourceNotFoundException resourceNotFoundException) {
-        Map<String, String> mensaje = new HashMap<>();
-        mensaje.put("mensaje", "Recurso no encontrado: " + resourceNotFoundException.getMessage());
-        return mensaje;
+    public Map<String, String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Recurso no encontrado: " + ex.getMessage());
+        return response;
     }
 
-
-    //manejo global de la BadRequest
-
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> manejarValidationException(MethodArgumentNotValidException methodArgumentNotValidException) {
+    public Map<String, String> handleValidationException(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
 
-        Map<String, String> mensaje = new HashMap<>();
-
-        methodArgumentNotValidException.getBindingResult().getAllErrors().forEach(e -> {
-            String nombreCampo = ((FieldError) e).getField();
-            String mensajeError = e.getDefaultMessage();
-            mensaje.put(nombreCampo, mensajeError);
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
         });
 
-        return mensaje;
+        return errors;
     }
-
-
 }

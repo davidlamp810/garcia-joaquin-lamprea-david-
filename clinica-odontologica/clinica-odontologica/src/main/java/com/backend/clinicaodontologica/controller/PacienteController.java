@@ -11,48 +11,47 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController //@ResponseBody + @Controller
+@RestController
 @RequestMapping("/pacientes")
 public class PacienteController {
 
-    //cliente -> json -> dto -> controlador -> dto -> servicio : dto -> entity -> persistencia -> entity -> servicio : entity -> dto -> controlador -> dto : json_
-    private IPacienteService pacienteService;
+    private final IPacienteService pacienteService;
 
     public PacienteController(IPacienteService pacienteService) {
         this.pacienteService = pacienteService;
     }
 
-    //GET
-    @GetMapping()
+    // GET
+    @GetMapping
     public ResponseEntity<List<PacienteSalidaDto>> listarPacientes() {
-        return new ResponseEntity<>(pacienteService.listarPacientes(), HttpStatus.OK);
+        List<PacienteSalidaDto> pacientes = pacienteService.listarPacientes();
+        return new ResponseEntity<>(pacientes, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}") //localhost:8080/pacientes/x
+    @GetMapping("/{id}")
     public ResponseEntity<PacienteSalidaDto> buscarPacientePorId(@PathVariable Long id) {
-        return new ResponseEntity<>(pacienteService.buscarPacientePorId(id), HttpStatus.OK);
+        PacienteSalidaDto paciente = pacienteService.buscarPacientePorId(id);
+        return new ResponseEntity<>(paciente, HttpStatus.OK);
     }
 
-
-    //POST
+    // POST
     @PostMapping("/registrar")
-    public ResponseEntity<PacienteSalidaDto> registrarPaciente(@RequestBody @Valid PacienteEntradaDto paciente) {
-        return new ResponseEntity<>(pacienteService.registrarPaciente(paciente), HttpStatus.CREATED);
+    public ResponseEntity<PacienteSalidaDto> registrarPaciente(@Valid @RequestBody PacienteEntradaDto paciente) {
+        PacienteSalidaDto nuevoPaciente = pacienteService.registrarPaciente(paciente);
+        return new ResponseEntity<>(nuevoPaciente, HttpStatus.CREATED);
     }
 
-
-    //PUT
-    @PutMapping("/actualizar/{id}")//localhost:8080/pacientes/actualizar/x
-    public ResponseEntity<PacienteSalidaDto> actualizarPaciente(@RequestBody @Valid PacienteEntradaDto paciente, @PathVariable Long id) throws ResourceNotFoundException {
-        return new ResponseEntity<>(pacienteService.modificarPaciente(paciente, id), HttpStatus.OK);
+    // PUT
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<PacienteSalidaDto> actualizarPaciente(@Valid @RequestBody PacienteEntradaDto paciente, @PathVariable Long id) throws ResourceNotFoundException {
+        PacienteSalidaDto pacienteActualizado = pacienteService.modificarPaciente(paciente, id);
+        return new ResponseEntity<>(pacienteActualizado, HttpStatus.OK);
     }
 
-    //DELETE
-    @DeleteMapping("/eliminar")//localhost:8080/pacientes/eliminar?id=x
-    public ResponseEntity<?> eliminarPaciente(@RequestParam Long id) throws ResourceNotFoundException {
+    // DELETE
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<?> eliminarPaciente(@PathVariable Long id) throws ResourceNotFoundException {
         pacienteService.eliminarPaciente(id);
         return new ResponseEntity<>("Paciente eliminado correctamente", HttpStatus.NO_CONTENT);
     }
-
-
 }

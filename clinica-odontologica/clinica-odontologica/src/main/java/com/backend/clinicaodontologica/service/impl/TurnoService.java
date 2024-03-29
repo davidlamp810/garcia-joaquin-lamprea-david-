@@ -11,19 +11,22 @@ import com.backend.clinicaodontologica.service.ITurnoService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class TurnoService implements ITurnoService {
-    private final Logger LOGGER = LoggerFactory.getLogger(TurnoService.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TurnoService.class);
+
     private final TurnoRepository turnoRepository;
     private final ModelMapper modelMapper;
-
     private final PacienteService pacienteService;
     private final OdontologoService odontologoService;
 
+    @Autowired
     public TurnoService(TurnoRepository turnoRepository, ModelMapper modelMapper, PacienteService pacienteService, OdontologoService odontologoService) {
         this.turnoRepository = turnoRepository;
         this.modelMapper = modelMapper;
@@ -31,57 +34,43 @@ public class TurnoService implements ITurnoService {
         this.odontologoService = odontologoService;
     }
 
-
     @Override
     public TurnoSalidaDto registrarTurno(TurnoEntradaDto turnoEntradaDto) throws BadRequestException {
-        TurnoSalidaDto turnoSalidaDto;
         PacienteSalidaDto paciente = pacienteService.buscarPacientePorId(turnoEntradaDto.getPacienteId());
         OdontologoSalidaDto odontologo = odontologoService.buscarOdontologoPorId(turnoEntradaDto.getOdontologoId());
 
-        String pacienteNoEnBdd = "El paciente no se encuentra en nuestra base de datos";
-        String odontologoNoEnBdd = "El odontologo no se encuentra en nuestra base de datos";
-        String ambosNulos = "El paciente y el odontologo no se encuentran en nuestra base de datos";
-
         if (paciente == null || odontologo == null) {
-            if (paciente == null && odontologo == null) {
-                LOGGER.error(ambosNulos);
-                throw new BadRequestException(ambosNulos);
-            } else if (paciente == null) {
-                LOGGER.error(pacienteNoEnBdd);
-                throw new BadRequestException(pacienteNoEnBdd);
-            } else {
-                LOGGER.error(odontologoNoEnBdd);
-                throw new BadRequestException(odontologoNoEnBdd);
-            }
-
-        } else {
-            Turno turnoNuevo = turnoRepository.save(modelMapper.map(turnoEntradaDto, Turno.class));
-            turnoSalidaDto = entidadADtoSalida(turnoNuevo, paciente, odontologo);
-            LOGGER.info("Nuevo turno registrado con exito: {}", turnoSalidaDto);
+            String errorMessage = paciente == null ? "El paciente no se encuentra en nuestra base de datos" : "El odontologo no se encuentra en nuestra base de datos";
+            LOGGER.error(errorMessage);
+            throw new BadRequestException(errorMessage);
         }
 
-
+        Turno nuevoTurno = turnoRepository.save(modelMapper.map(turnoEntradaDto, Turno.class));
+        TurnoSalidaDto turnoSalidaDto = entidadADtoSalida(nuevoTurno, paciente, odontologo);
+        LOGGER.info("Nuevo turno registrado con éxito: {}", turnoSalidaDto);
         return turnoSalidaDto;
     }
 
-
     @Override
     public List<TurnoSalidaDto> listarTurnos() {
+        // Implementación para listar todos los turnos
         return null;
     }
 
     @Override
     public TurnoSalidaDto buscarTurnoPorId(Long id) {
+        // Implementación para buscar un turno por su ID
         return null;
     }
 
     @Override
     public void eliminarTurno(Long id) {
-
+        // Implementación para eliminar un turno por su ID
     }
 
     @Override
     public TurnoSalidaDto modificarTurno(TurnoEntradaDto turnoEntradaDto, Long id) {
+        // Implementación para modificar un turno por su ID
         return null;
     }
 
@@ -91,6 +80,4 @@ public class TurnoService implements ITurnoService {
         turnoSalidaDto.setOdontologoSalidaDto(odontologoSalidaDto);
         return turnoSalidaDto;
     }
-
-
 }

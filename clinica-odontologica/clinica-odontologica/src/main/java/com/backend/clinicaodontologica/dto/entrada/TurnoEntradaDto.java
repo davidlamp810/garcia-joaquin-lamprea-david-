@@ -11,7 +11,7 @@ public class TurnoEntradaDto {
     @NotNull(message = "El paciente no puede ser nulo")
     private Long pacienteId;
 
-    @NotNull(message = "El odontologo no puede ser nulo")
+    @NotNull(message = "El odontólogo no puede ser nulo")
     private Long odontologoId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")

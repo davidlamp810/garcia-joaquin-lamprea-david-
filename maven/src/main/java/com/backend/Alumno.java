@@ -1,14 +1,16 @@
-package com.backend;
+package com.backend; // Asumiendo que el paquete es com.backend
 
 public class Alumno {
 
-    //POJO plain old java object
+    // Atributos
     private String nombre;
 
+    // Constructor
     public Alumno(String nombre) {
         this.nombre = nombre;
     }
 
+    // Métodos Getter y Setter para el atributo nombre
     public String getNombre() {
         return nombre;
     }
@@ -17,3 +19,4 @@ public class Alumno {
         this.nombre = nombre;
     }
 }
+

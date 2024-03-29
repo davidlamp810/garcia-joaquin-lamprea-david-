@@ -1,5 +1,7 @@
 package com.backend.clinicaodontologica.dto.salida;
 
+import java.util.Objects;
+
 public class OdontologoSalidaDto {
 
     private Long id;
@@ -47,5 +49,21 @@ public class OdontologoSalidaDto {
 
     public void setApellido(String apellido) {
         this.apellido = apellido;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OdontologoSalidaDto that = (OdontologoSalidaDto) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(matricula, that.matricula) &&
+                Objects.equals(nombre, that.nombre) &&
+                Objects.equals(apellido, that.apellido);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, matricula, nombre, apellido);
     }
 }

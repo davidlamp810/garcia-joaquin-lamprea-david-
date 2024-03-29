@@ -5,17 +5,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-
 public class DomicilioEntradaDto {
 
     @NotNull(message = "El campo calle no puede ser nulo")
     @NotBlank(message = "El campo calle no puede estar en blanco")
     private String calle;
 
-    //@NotNull(message = "El campo numero no puede ser nulo")
-    @Positive(message = "El numero no puede ser nulo o menor a cero")
+    @Positive(message = "El número debe ser mayor que cero")
     @Digits(integer = 8, fraction = 0, message = "El número debe tener como máximo 8 dígitos")
-    private int numero;
+    private Integer numero;
 
     @NotNull(message = "El campo localidad no puede ser nulo")
     @NotBlank(message = "El campo localidad no puede estar en blanco")
@@ -28,7 +26,7 @@ public class DomicilioEntradaDto {
     public DomicilioEntradaDto() {
     }
 
-    public DomicilioEntradaDto(String calle, int numero, String localidad, String provincia) {
+    public DomicilioEntradaDto(String calle, Integer numero, String localidad, String provincia) {
         this.calle = calle;
         this.numero = numero;
         this.localidad = localidad;
@@ -43,11 +41,11 @@ public class DomicilioEntradaDto {
         this.calle = calle;
     }
 
-    public int getNumero() {
+    public Integer getNumero() {
         return numero;
     }
 
-    public void setNumero(int numero) {
+    public void setNumero(Integer numero) {
         this.numero = numero;
     }
 

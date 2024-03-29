@@ -12,17 +12,17 @@ public class Turno {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "odontologo_id")
+    @JoinColumn(name = "odontologo_id", referencedColumnName = "id")
     private Odontologo odontologo;
 
     @ManyToOne
-    @JoinColumn(name = "paciente_id")
+    @JoinColumn(name = "paciente_id", referencedColumnName = "id")
     private Paciente paciente;
+
     private LocalDateTime fechaYHora;
 
     public Turno() {
     }
-
 
     public Turno(Long id, Odontologo odontologo, Paciente paciente, LocalDateTime fechaYHora) {
         this.id = id;
@@ -35,6 +35,9 @@ public class Turno {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Odontologo getOdontologo() {
         return odontologo;

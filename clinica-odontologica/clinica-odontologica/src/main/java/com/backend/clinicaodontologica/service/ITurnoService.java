@@ -1,6 +1,5 @@
 package com.backend.clinicaodontologica.service;
 
-
 import com.backend.clinicaodontologica.dto.entrada.TurnoEntradaDto;
 import com.backend.clinicaodontologica.dto.salida.TurnoSalidaDto;
 import com.backend.clinicaodontologica.exceptions.BadRequestException;
@@ -17,5 +16,5 @@ public interface ITurnoService {
 
     void eliminarTurno(Long id);
 
-    TurnoSalidaDto modificarTurno(TurnoEntradaDto turnoEntradaDto, Long id);
+    TurnoSalidaDto modificarTurno(TurnoEntradaDto turnoEntradaDto, Long id) throws ResourceNotFoundException;
 }

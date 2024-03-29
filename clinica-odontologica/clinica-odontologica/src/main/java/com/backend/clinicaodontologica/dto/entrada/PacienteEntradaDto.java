@@ -7,22 +7,21 @@ import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 public class PacienteEntradaDto {
-    //@NotNull(message = "El nombre del paciente no puede ser nulo")
+
     @NotBlank(message = "Debe especificarse el nombre del paciente")
     @Size(max = 50, message = "El nombre debe tener hasta 50 caracteres")
     private String nombre;
 
-    @Size(max = 50, message = "El apellido debe tener hasta 50 caracteres")
     @NotBlank(message = "Debe especificarse el apellido del paciente")
+    @Size(max = 50, message = "El apellido debe tener hasta 50 caracteres")
     private String apellido;
 
-    @Positive(message = "El dni del paciente no puede ser nulo o menor a cero")
+    @Positive(message = "El DNI del paciente debe ser mayor que cero")
     private int dni;
 
-    @FutureOrPresent(message = "La fecha no puede ser anterior al día de hoy")
+    @FutureOrPresent(message = "La fecha de ingreso del paciente no puede ser anterior a hoy")
     @NotNull(message = "Debe especificarse la fecha de ingreso del paciente")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    //@JsonProperty("date")
     private LocalDate fechaIngreso;
 
     @NotNull(message = "El domicilio del paciente no puede ser nulo")

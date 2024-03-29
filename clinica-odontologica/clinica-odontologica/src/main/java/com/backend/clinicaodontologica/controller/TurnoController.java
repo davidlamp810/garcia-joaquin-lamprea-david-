@@ -18,16 +18,17 @@ import javax.validation.Valid;
 @RequestMapping("/turnos")
 public class TurnoController {
 
-    private ITurnoService turnoService;
+    private final ITurnoService turnoService;
 
     public TurnoController(ITurnoService turnoService) {
         this.turnoService = turnoService;
     }
 
-    //POST
+    // POST
     @PostMapping("/registrar")
-    public ResponseEntity<TurnoSalidaDto> registrarPaciente(@RequestBody @Valid TurnoEntradaDto turnoEntradaDto) throws BadRequestException, ResourceNotFoundException {
-        return new ResponseEntity<>(turnoService.registrarTurno(turnoEntradaDto), HttpStatus.CREATED);
+    public ResponseEntity<TurnoSalidaDto> registrarTurno(@Valid @RequestBody TurnoEntradaDto turnoEntradaDto) throws BadRequestException, ResourceNotFoundException {
+        TurnoSalidaDto nuevoTurno = turnoService.registrarTurno(turnoEntradaDto);
+        return new ResponseEntity<>(nuevoTurno, HttpStatus.CREATED);
     }
-
 }
+

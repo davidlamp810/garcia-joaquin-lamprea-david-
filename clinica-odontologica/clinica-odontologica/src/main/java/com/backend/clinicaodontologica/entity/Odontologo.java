@@ -1,6 +1,8 @@
 package com.backend.clinicaodontologica.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "ODONTOLOGOS")
@@ -9,13 +11,17 @@ public class Odontologo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "La matrícula del odontólogo no puede estar en blanco")
     @Column(length = 50)
     private String matricula;
+
+    @NotBlank(message = "El nombre del odontólogo no puede estar en blanco")
     @Column(length = 50)
     private String nombre;
+
+    @NotBlank(message = "El apellido del odontólogo no puede estar en blanco")
     @Column(length = 50)
     private String apellido;
-
 
     public Odontologo() {
     }
@@ -58,6 +64,4 @@ public class Odontologo {
     public void setApellido(String apellido) {
         this.apellido = apellido;
     }
-
-
 }

@@ -13,8 +13,8 @@ public class Domicilio {
     @Column(length = 50)
     private String calle;
 
-    @Column(length = 8)
-    private int numero;
+    private int numero; // Corregido aquí
+
     @Column(length = 50)
     private String localidad;
 
@@ -71,6 +71,4 @@ public class Domicilio {
     public void setProvincia(String provincia) {
         this.provincia = provincia;
     }
-
-
 }

@@ -10,22 +10,21 @@ import com.backend.clinicaodontologica.utils.JsonPrinter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PacienteService implements IPacienteService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PacienteService.class);
 
-    private final Logger LOGGER = LoggerFactory.getLogger(PacienteService.class);
+    private final PacienteRepository pacienteRepository;
+    private final ModelMapper modelMapper;
 
-
-    private PacienteRepository pacienteRepository;
-
-    private ModelMapper modelMapper;
-
-
+    @Autowired
     public PacienteService(PacienteRepository pacienteRepository, ModelMapper modelMapper) {
         this.pacienteRepository = pacienteRepository;
         this.modelMapper = modelMapper;
@@ -33,107 +32,63 @@ public class PacienteService implements IPacienteService {
     }
 
     @Override
-    public PacienteSalidaDto registrarPaciente(PacienteEntradaDto paciente) {
-        //Logueamos lo que recibimos
-        LOGGER.info("PacienteEntradaDto: {}", JsonPrinter.toString(paciente));
-        //convertimos mediante el mapper de dtoEntrada a entidad
-        Paciente pacienteEntidad = modelMapper.map(paciente, Paciente.class);
-        //mandamos a persistir a la capa dao y obtenemos una entidad con ID
-        Paciente pacienteEntidaConId = pacienteRepository.save(pacienteEntidad);
-        //transformamos la entidad obtenida en salidaDto
-        PacienteSalidaDto pacienteSalidaDto = modelMapper.map(pacienteEntidaConId, PacienteSalidaDto.class);
-        //Logueamos lo que sale
+    public PacienteSalidaDto registrarPaciente(PacienteEntradaDto pacienteDto) {
+        LOGGER.info("PacienteEntradaDto: {}", JsonPrinter.toString(pacienteDto));
+        Paciente pacienteEntidad = modelMapper.map(pacienteDto, Paciente.class);
+        Paciente pacienteEntidadConId = pacienteRepository.save(pacienteEntidad);
+        PacienteSalidaDto pacienteSalidaDto = modelMapper.map(pacienteEntidadConId, PacienteSalidaDto.class);
         LOGGER.info("PacienteSalidaDto: {}", JsonPrinter.toString(pacienteSalidaDto));
         return pacienteSalidaDto;
     }
 
     @Override
     public List<PacienteSalidaDto> listarPacientes() {
-
         List<PacienteSalidaDto> pacientesSalidaDto = pacienteRepository.findAll()
                 .stream()
                 .map(paciente -> modelMapper.map(paciente, PacienteSalidaDto.class))
-                .toList();
-
-        //List<Paciente> pacientes = pacienteIDao.listarTodos();
-        //List<PacienteSalidaDto> pacientesSalidaDto = new ArrayList<>();
-        //for (Paciente paciente : pacientes){
-        //    PacienteSalidaDto pacienteSalida = modelMapper.map(paciente, PacienteSalidaDto.class);
-        //    pacientesSalidaDto.add(pacienteSalida);
-        //}
-
+                .collect(Collectors.toList());
         LOGGER.info("Listado de todos los pacientes: {}", JsonPrinter.toString(pacientesSalidaDto));
         return pacientesSalidaDto;
     }
 
     @Override
     public PacienteSalidaDto buscarPacientePorId(Long id) {
-
-        Paciente pacienteBuscado = pacienteRepository.findById(id).orElse(null);
-        PacienteSalidaDto pacienteEncontrado = null;
-
-        if (pacienteBuscado != null) {
-            pacienteEncontrado = modelMapper.map(pacienteBuscado, PacienteSalidaDto.class);
-            LOGGER.info("Paciente encontrado: {}", JsonPrinter.toString(pacienteEncontrado));
-
-        } else
-            LOGGER.error("No se ha encontrado el paciente con id {}", id);
-
-
+        Paciente pacienteBuscado = pacienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con ID: " + id));
+        PacienteSalidaDto pacienteEncontrado = modelMapper.map(pacienteBuscado, PacienteSalidaDto.class);
+        LOGGER.info("Paciente encontrado: {}", JsonPrinter.toString(pacienteEncontrado));
         return pacienteEncontrado;
     }
 
     @Override
-    public void eliminarPaciente(Long id) throws ResourceNotFoundException {
-
-        if (buscarPacientePorId(id) != null) {
+    public void eliminarPaciente(Long id) {
+        if (pacienteRepository.existsById(id)) {
             pacienteRepository.deleteById(id);
-            LOGGER.warn("Se ha eliminado el paciente con id {}", id);
+            LOGGER.warn("Se ha eliminado el paciente con ID: {}", id);
         } else {
-            //LOGGER.error("No se ha encontrado el paciente con id {}", id);
-            throw new ResourceNotFoundException("No existe registro de paciente con id " + id);
+            throw new ResourceNotFoundException("Paciente no encontrado con ID: " + id);
         }
-
     }
 
     @Override
-    public PacienteSalidaDto modificarPaciente(PacienteEntradaDto pacienteEntradaDto, Long id) throws ResourceNotFoundException {
-        Paciente pacienteRecibido = modelMapper.map(pacienteEntradaDto, Paciente.class);
-        Paciente pacienteAActualizar = pacienteRepository.findById(id).orElse(null);
-
-        PacienteSalidaDto pacienteSalidaDto = null;
-
-        if (pacienteAActualizar != null) {
-            pacienteAActualizar.setNombre(pacienteRecibido.getNombre());
-            pacienteAActualizar.setApellido(pacienteRecibido.getApellido());
-            pacienteAActualizar.setDni(pacienteRecibido.getDni());
-            pacienteAActualizar.setFechaIngreso(pacienteRecibido.getFechaIngreso());
-            pacienteAActualizar.getDomicilio().setNumero(pacienteRecibido.getDomicilio().getNumero());
-            pacienteAActualizar.getDomicilio().setLocalidad(pacienteRecibido.getDomicilio().getLocalidad());
-            pacienteAActualizar.getDomicilio().setProvincia(pacienteRecibido.getDomicilio().getProvincia());
-
-            pacienteRepository.save(pacienteAActualizar);
-
-            pacienteSalidaDto = modelMapper.map(pacienteAActualizar, PacienteSalidaDto.class);
-            LOGGER.warn("Paciente actualizado: {}", JsonPrinter.toString(pacienteSalidaDto));
-
-        } else {
-            LOGGER.error("No fue posible actualizar el paciente porque no se encuentra en nuestra base de datos");
-            throw new ResourceNotFoundException("No es posible actualizar el paciente con id " + id + " ya que no se encuentra en nuestra base de datos");
+    public PacienteSalidaDto modificarPaciente(PacienteEntradaDto pacienteDto, Long id) {
+        if (!pacienteRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Paciente no encontrado con ID: " + id);
         }
 
-
+        Paciente pacienteRecibido = modelMapper.map(pacienteDto, Paciente.class);
+        pacienteRecibido.setId(id);
+        Paciente pacienteActualizado = pacienteRepository.save(pacienteRecibido);
+        PacienteSalidaDto pacienteSalidaDto = modelMapper.map(pacienteActualizado, PacienteSalidaDto.class);
+        LOGGER.warn("Paciente actualizado: {}", JsonPrinter.toString(pacienteSalidaDto));
         return pacienteSalidaDto;
     }
-
 
     private void configureMapping() {
         modelMapper.typeMap(PacienteEntradaDto.class, Paciente.class)
                 .addMappings(mapper -> mapper.map(PacienteEntradaDto::getDomicilioEntradaDto, Paciente::setDomicilio));
 
-
         modelMapper.typeMap(Paciente.class, PacienteSalidaDto.class)
                 .addMappings(mapper -> mapper.map(Paciente::getDomicilio, PacienteSalidaDto::setDomicilioSalidaDto));
-
     }
 }

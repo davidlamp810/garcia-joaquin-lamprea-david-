@@ -19,42 +19,42 @@ public class OdontologoController {
         this.odontologoService = odontologoService;
     }
 
-    //POST
+    // POST
 
-    @PostMapping("registrar")
-
+    @PostMapping("/registrar")
     public ResponseEntity<OdontologoSalidaDto> registrarOdontologo(@Valid @RequestBody OdontologoEntradaDto odontologo) {
-        return new ResponseEntity<>(odontologoService.registrarOdontologo(odontologo), HttpStatus.CREATED);
+        OdontologoSalidaDto nuevoOdontologo = odontologoService.registrarOdontologo(odontologo);
+        return new ResponseEntity<>(nuevoOdontologo, HttpStatus.CREATED);
     }
 
-    //PUT
+    // PUT
 
-    @PutMapping("actualizar/{id}")
+    @PutMapping("/actualizar/{id}")
     public ResponseEntity<OdontologoSalidaDto> actualizarOdontologo(@Valid @RequestBody OdontologoEntradaDto odontologo, @PathVariable Long id) {
-        return null; //pacienteService.actualizar(paciente, id);
+        OdontologoSalidaDto odontologoActualizado = odontologoService.actualizarOdontologo(odontologo, id);
+        return new ResponseEntity<>(odontologoActualizado, HttpStatus.OK);
     }
 
-    //GET
+    // GET
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<OdontologoSalidaDto> obtenerOdontologoPorId(@PathVariable Long id) {
-        return new ResponseEntity<>(odontologoService.buscarOdontologoPorId(id), HttpStatus.OK);
+        OdontologoSalidaDto odontologo = odontologoService.buscarOdontologoPorId(id);
+        return new ResponseEntity<>(odontologo, HttpStatus.OK);
     }
-
 
     @GetMapping()
-
     public ResponseEntity<List<OdontologoSalidaDto>> listarOdontologos() {
-        return new ResponseEntity<>(odontologoService.listarOdontologos(), HttpStatus.OK);
+        List<OdontologoSalidaDto> odontologos = odontologoService.listarOdontologos();
+        return new ResponseEntity<>(odontologos, HttpStatus.OK);
     }
 
-    //DELETE
+    // DELETE
 
-    @DeleteMapping("eliminar/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarOdontologo(@PathVariable Long id) {
         odontologoService.eliminarOdontologo(id);
         return new ResponseEntity<>("Odontologo eliminado correctamente", HttpStatus.NO_CONTENT);
-
     }
-
 }
+

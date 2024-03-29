@@ -9,18 +9,21 @@ public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(length = 50)
     private String nombre;
+
     @Column(length = 50)
     private String apellido;
-    @Column(length = 20)
+
+    @Column(unique = true) // Añadido unique constraint para evitar duplicados
     private int dni;
+
     private LocalDate fechaIngreso;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "domicilio_id")
     private Domicilio domicilio;
-
 
     public Paciente() {
     }
@@ -33,7 +36,6 @@ public class Paciente {
         this.fechaIngreso = fechaIngreso;
         this.domicilio = domicilio;
     }
-
 
     public Long getId() {
         return id;
@@ -82,6 +84,4 @@ public class Paciente {
     public void setDomicilio(Domicilio domicilio) {
         this.domicilio = domicilio;
     }
-
-
 }
